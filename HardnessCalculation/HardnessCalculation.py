@@ -3,6 +3,8 @@ import string
 from tkinter import *
 from tkinter import ttk
 import math
+import pandas
+import numpy
 
 def clear_error_messages():
     power_error_message.set("")
