@@ -8,6 +8,60 @@ from numbers import Number
 import numpy as np
 import pandas as pd
 
+def load_validate(load_input):
+    load_error_mess.set(str())
+    if load_input in numbers:
+        if load_input<=0:
+            load_error_mess.set("Load must be positive")
+        else:
+            return load_input
+    else:
+        load_error_mess.set("Invalid value for load")
+
+def ball_validate(ball_input):
+    ball_error_mess.set(str())
+    if ball_input in numbers:
+        if ball_input <= 0:
+            ball_error_mess.set("Ball diameter must be positive")
+        else:
+            return ball_input
+    else:
+        ball_error_mess.set("Invalid value for ball diameter")
+
+def trace_validate(trace_input):
+    trace_error_mess.set(str())
+    if trace_input in numbers:
+        if trace_input <= 0:
+            trace_error_mess.set("Trace diameter must be positive")
+        else:
+            return trace_input
+    else:
+        trace_error_mess.set("Invalid value for trace diameter")
+
+def hb_validate(hb_input):
+    hb_error_mess.set(str())
+    if hb_input in numbers:
+        if hb_input <= 0:
+            trace_error_mess.set("HB value must be positive")
+        else:
+            return hb_input
+    else:
+        trace_error_mess.set("Invalid value for HB")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 def get_hb(path):
     try: return pd.read_csv(path, sep=',')
     except: hrc_result_mess.set("Could not read the file 'hardness.csv'")
@@ -94,45 +148,51 @@ root.title("Hardness calculation")
 root.geometry("300x250+200+200")
 root.attributes("-toolwindow", True)
 
-load_error_mess=StringVar()
-ball_diam_error_mess=StringVar()
-imprint_diam_error_mess=StringVar()
-hb_result_mess=StringVar()
-hrc_result_mess=StringVar()
-
 load_entry=ttk.Entry()
-ball_diam_entry=ttk.Entry()
-imprint_diam_entry=ttk.Entry()
-hrc_entry=ttk.Entry()
+load_entry.insert(0,"Enter load")
+load_entry.pack()
+
+ball_entry=ttk.Entry()
+ball_entry.insert(0,"Enter ball diameter")
+ball_entry.pack()
+
+trace_entry=ttk.Entry()
+trace_entry.insert(0,"Enter trace diameter")
+trace_entry.pack()
 
 hb_calc_button = ttk.Button(text="Calculate HB",command=hb_calc_click)
-hrc_calc_button=ttk.Button(text="Calculate HRC", command=hrc_calc_click)
-
-load_error_label=ttk.Label(textvariable=load_error_mess)
-ball_diam_error_label=ttk.Label(textvariable=ball_diam_error_mess)
-imprint_diam_error_label=ttk.Label(textvariable=imprint_diam_error_mess)
-hb_result_label=ttk.Label(textvariable=hb_result_mess)
-hrc_result_label=ttk.Label(textvariable=hrc_result_mess)
-
-load_entry.pack()
-load_entry.insert(0,"Enter load")
-
-ball_diam_entry.pack()
-ball_diam_entry.insert(0,"Enter ball diameter")
-
-imprint_diam_entry.pack()
-imprint_diam_entry.insert(0,"Enter imprint diameter")
-
-load_error_label.pack()
-ball_diam_error_label.pack()
-imprint_diam_error_label.pack()
-
 hb_calc_button.pack()
+
+hb_result_mess=StringVar()
+hb_result_label=ttk.Label(textvariable=hb_result_mess)
 hb_result_label.pack()
-hrc_entry.pack()
-hrc_entry.insert(0,"Enter HB")
+
+load_error_mess=StringVar()
+load_error_label=ttk.Label(textvariable=load_error_mess)
+load_error_label.pack()
+
+ball_error_mess=StringVar()
+ball_error_label=ttk.Label(textvariable=ball_error_mess)
+ball_error_label.pack()
+
+trace_error_mess=StringVar()
+trace_error_label=ttk.Label(textvariable=trace_error_mess)
+trace_error_label.pack()
+
+hb_entry=ttk.Entry()
+hb_entry.insert(0,"Enter HB")
+hb_entry.pack()
+
+hrc_calc_button = ttk.Button(text="Calculate HRC",command=hrc_calc_click)
 hrc_calc_button.pack()
+
+hrc_result_mess=StringVar()
+hrc_result_label=ttk.Label(textvariable=hrc_result_mess)
 hrc_result_label.pack()
+
+hb_error_mess=StringVar()
+hb_error_label=ttk.Label(textvariable=hb_error_mess)
+hb_error_label.pack()
 
 root.mainloop()
 
