@@ -1,152 +1,134 @@
-import numbers
-from cgitb import text
-import string
 from tkinter import *
 from tkinter import ttk
 import math
-from numbers import Number
 import numpy as np
 import pandas as pd
+from numpy.f2py.auxfuncs import throw_error
 
-def load_validate(load_input):
-    load_error_mess.set(str())
-    if load_input in numbers:
-        if load_input<=0:
-            load_error_mess.set("Load must be positive")
-        else:
-            return load_input
-    else:
-        load_error_mess.set("Invalid value for load")
-
-def ball_validate(ball_input):
-    ball_error_mess.set(str())
-    if ball_input in numbers:
-        if ball_input <= 0:
-            ball_error_mess.set("Ball diameter must be positive")
-        else:
-            return ball_input
-    else:
-        ball_error_mess.set("Invalid value for ball diameter")
-
-def trace_validate(trace_input):
-    trace_error_mess.set(str())
-    if trace_input in numbers:
-        if trace_input <= 0:
-            trace_error_mess.set("Trace diameter must be positive")
-        else:
-            return trace_input
-    else:
-        trace_error_mess.set("Invalid value for trace diameter")
-
-def hb_validate(hb_input):
-    hb_error_mess.set(str())
-    if hb_input in numbers:
-        if hb_input <= 0:
-            trace_error_mess.set("HB value must be positive")
-        else:
-            return hb_input
-    else:
-        trace_error_mess.set("Invalid value for HB")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-def get_hb(path):
-    try: return pd.read_csv(path, sep=',')
-    except: hrc_result_mess.set("Could not read the file 'hardness.csv'")
-
-def calc_hb(load,ball_diam,imprint_diam):
-    return round((2*load)/(math.pi*ball_diam*(ball_diam-(math.sqrt(math.pow(ball_diam,2)-math.pow(imprint_diam,2))))),3)
-
-def  calc_hrc(hb):
-    try:
-        df = get_hb('hardness.csv')
-        hb_max=df['hb'].max()
-        hb_min=df['hb'].min()
-        print(hb,hb_min,hb_max)
-        if hb<hb_min:hrc_result_mess.set(f"Brinell hardness value less than {hb_min} HB,\nRockwell hardness undefined")
-        elif hb>hb_max:hrc_result_mess.set(f"Brinell hardness value more than {hb_max} HB,\nRockwell hardness undefined")
-        else: return interpol(hb,df['hb'],df['hrc'])
-    except:
-        hrc_result_mess.set("Undefined")
 
 def interpol(value,value_col,result_col):
     return np.interp(value,value_col,result_col)
 
-def get_hb_value():
+def calc_hb(load, ball, trace):
+    return round((2*load) / (math.pi * ball * (ball - (math.sqrt(math.pow(ball, 2) - math.pow(trace, 2))))), 3)
+
+def calc_hrc(hb,df):
+    return round(interpol(hb,df['hb'],df['hrc']),3)
+
+def validate_load(load_input):
+    if load_input <= 0:
+        load_error_mess.set("Load must be positive")
+    else:
+        return load_input
+
+def validate_ball(ball_input):
+    if ball_input <= 0:
+        ball_error_mess.set("Ball diameter must be positive")
+    else:
+        return ball_input
+
+def validate_trace(trace_input):
+    if trace_input <= 0:
+        trace_error_mess.set("Trace diameter must be positive")
+    else:
+        return trace_input
+
+def validate_hb(hb_input):
+    if hb_input <= 0:
+        hb_error_mess.set("HB value must be positive")
+    else:
+        return hb_input
+
+def get_df(path):
     try:
-        hrc_result_mess.set(str())
-        hb=hrc_entry.get()
-        hb_value=float(hb)
-        if hb_value<=0:hrc_result_mess.set("HB value must be positive")
-        else:return hb_value
-    except:hrc_result_mess.set("Invalid value for HB")
+        return pd.read_csv(path, sep=',')
+    except:
+        df_error_mess.set(f"Can't read {path}")
+
+def read_load():
+    return load_entry.get()
+
+def read_ball():
+    return ball_entry.get()
+
+def read_trace():
+    return trace_entry.get()
+
+def read_hb():
+    return hb_entry.get()
 
 def get_load_value():
+    load_error_mess.set(str())
+    entry_value=read_load()
     try:
-        load_error_mess.set(str())
-        load_entry_value=load_entry.get()
-        load_value=float(load_entry_value)
-        if load_value<=0:load_error_mess.set("Load must be positive")
-        else:return load_value
+        value=float(entry_value)
+        return validate_load(value)
     except:
         load_error_mess.set("Invalid value for load")
 
-def get_ball_diam_value():
+def get_ball_value():
+    ball_error_mess.set(str())
+    entry_value=read_ball()
     try:
-        ball_diam_error_mess.set(str())
-        ball_diam_entry_value=ball_diam_entry.get()
-        ball_diam_value=float(ball_diam_entry_value)
-        if ball_diam_value <= 0: ball_diam_error_mess.set("Ball diameter must be positive")
-        else: return ball_diam_value
+        value = float(entry_value)
+        return validate_ball(value)
     except:
-        ball_diam_error_mess.set("Invalid value for ball diameter")
+        ball_error_mess.set("Invalid value for ball")
 
-def get_imprint_diam_value():
+def get_trace_value():
+    trace_error_mess.set(str())
+    entry_value=read_trace()
     try:
-        imprint_diam_error_mess.set(str())
-        imprint_diam_entry_value=imprint_diam_entry.get()
-        imprint_diam_value=float(imprint_diam_entry_value)
-        if imprint_diam_value <= 0: imprint_diam_error_mess.set("Imprint diameter must be positive")
-        else: return imprint_diam_value
+        value = float(entry_value)
+        return validate_trace(value)
     except:
-        imprint_diam_error_mess.set("Invalid value for imprint diameter")
+        trace_error_mess.set("Invalid value for trace")
 
-def hb_calc_click():
-    load_value=get_load_value()
-    ball_diam_value=get_ball_diam_value()
-    imprint_diam_value=get_imprint_diam_value()
+def get_hb_value():
+    hb_error_mess.set(str())
+    entry_value=read_hb()
     try:
-        hb_value=calc_hb(load_value,ball_diam_value,imprint_diam_value)
-        hb_result_mess.set(f"{hb_value} HB")
-        hrc_entry.delete(0,END)
-        hrc_entry.insert(0, hb_value)
+        value = float(entry_value)
+        return validate_hb(value)
     except:
-        hb_result_mess.set("Undefined")
-
-def hrc_calc_click():
-    hb_value=get_hb_value()
-    try:
-        hrc_value=calc_hrc(hb_value)
-        hrc_result_mess.set(f"{hrc_value} HRC")
-    except:
-        hrc_result_mess.set("Undefined")
+        hb_error_mess.set("Invalid value for HB")
 
 root = Tk()
 root.title("Hardness calculation")
-root.geometry("300x250+200+200")
+root.geometry("400x300+200+200")
 root.attributes("-toolwindow", True)
+
+hb_result_mess=StringVar()
+load_error_mess=StringVar()
+ball_error_mess=StringVar()
+trace_error_mess=StringVar()
+hrc_result_mess=StringVar()
+hb_error_mess=StringVar()
+df_error_mess=StringVar()
+
+def calc_hb_click():
+    load=get_load_value()
+    ball=get_ball_value()
+    trace=get_trace_value()
+    try:
+        hb=calc_hb(load,ball,trace)
+        hb_result = validate_hb(hb)
+        hb_result_mess.set(f"{hb_result} HB")
+        hb_entry.delete(0,END)
+        hb_entry.insert(0, hb_result)
+        if trace<=(0.24*ball):trace_error_mess.set("Trace diameter less than 0.24*D,\nincrease the load")
+        elif trace>0.6*ball:trace_error_mess.set("Trace diameter more than 0.6*D,\nreduce the load")
+    except:
+        hb_result_mess.set("Can't calculate")
+
+def calc_hrc_click():
+    hb=get_hb_value()
+    df=get_df('hardness.csv')
+    hrc_result = calc_hrc(hb, df)
+    if math.isnan(hrc_result):
+        hrc_result_mess.set("Can't calculate")
+    else:
+        hrc_result_mess.set(f"{hrc_result} HRC")
 
 load_entry=ttk.Entry()
 load_entry.insert(0,"Enter load")
@@ -160,22 +142,18 @@ trace_entry=ttk.Entry()
 trace_entry.insert(0,"Enter trace diameter")
 trace_entry.pack()
 
-hb_calc_button = ttk.Button(text="Calculate HB",command=hb_calc_click)
+hb_calc_button = ttk.Button(text="Calculate HB",command=calc_hb_click)
 hb_calc_button.pack()
 
-hb_result_mess=StringVar()
 hb_result_label=ttk.Label(textvariable=hb_result_mess)
 hb_result_label.pack()
 
-load_error_mess=StringVar()
 load_error_label=ttk.Label(textvariable=load_error_mess)
 load_error_label.pack()
 
-ball_error_mess=StringVar()
 ball_error_label=ttk.Label(textvariable=ball_error_mess)
 ball_error_label.pack()
 
-trace_error_mess=StringVar()
 trace_error_label=ttk.Label(textvariable=trace_error_mess)
 trace_error_label.pack()
 
@@ -183,16 +161,17 @@ hb_entry=ttk.Entry()
 hb_entry.insert(0,"Enter HB")
 hb_entry.pack()
 
-hrc_calc_button = ttk.Button(text="Calculate HRC",command=hrc_calc_click)
+hrc_calc_button = ttk.Button(text="Calculate HRC",command=calc_hrc_click)
 hrc_calc_button.pack()
 
-hrc_result_mess=StringVar()
 hrc_result_label=ttk.Label(textvariable=hrc_result_mess)
 hrc_result_label.pack()
 
-hb_error_mess=StringVar()
 hb_error_label=ttk.Label(textvariable=hb_error_mess)
 hb_error_label.pack()
+
+df_error_label=ttk.Label(textvariable=df_error_mess)
+df_error_label.pack()
 
 root.mainloop()
 
