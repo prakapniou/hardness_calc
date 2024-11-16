@@ -143,9 +143,9 @@ try:
     resize_image=image.resize((350,75))
     img=ImageTk.PhotoImage(resize_image)
     logo_label=ttk.Label(image=img)
-    logo_label.pack()
 except:
     logo_label=ttk.Label(text="There should be an image here.")
+    logo_label.pack()
 
 load_entry=ttk.Entry()
 load_entry.insert(0,"Enter load.")
