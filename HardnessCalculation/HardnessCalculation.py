@@ -145,7 +145,7 @@ try:
     logo_label=ttk.Label(image=img)
     logo_label.pack()
 except:
-    print("error")
+    logo_label=ttk.Label(text="There should be an image here.")
 
 load_entry=ttk.Entry()
 load_entry.insert(0,"Enter load.")
